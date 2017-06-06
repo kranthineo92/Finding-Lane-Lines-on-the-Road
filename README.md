@@ -1,53 +1,152 @@
-#**Finding Lane Lines on the Road** 
-[![Udacity - Self-Driving Car NanoDegree](https://s3.amazonaws.com/udacity-sdc/github/shield-carnd.svg)](http://www.udacity.com/drive)
+**Finding Lane Lines on the Road**
 
-<img src="examples/laneLines_thirdPass.jpg" width="480" alt="Combined Image" />
+**Goal:**
 
-Overview
----
+The goal of this project is to find lane lines on road in a video. In
+this project, I used python3 and OpenCV to process images and identify
+lanes. Following images show the output of this project, image A is a
+given natural image as input and image C is the final image output after
+applying image pipeline mentioned in next section.
 
-When we drive, we use our eyes to decide where to go.  The lines on the road that show us where the lanes are act as our constant reference for where to steer the vehicle.  Naturally, one of the first things we would like to do in developing a self-driving car is to automatically detect lane lines using an algorithm.
+<img src="media/image1.jpeg" width="308" height="196" />
 
-In this project you will detect lane lines in images using Python and OpenCV.  OpenCV means "Open-Source Computer Vision", which is a package that has many useful tools for analyzing images.  
+1.  Plain Image
 
-To complete the project, two files will be submitted: a file containing project code and a file containing a brief write up explaining your solution. We have included template files to be used both for the [code](https://github.com/udacity/CarND-LaneLines-P1/blob/master/P1.ipynb) and the [writeup](https://github.com/udacity/CarND-LaneLines-P1/blob/master/writeup_template.md).The code file is called P1.ipynb and the writeup template is writeup_template.md 
+<img src="media/image2.png" width="323" height="196" />
 
-To meet specifications in the project, take a look at the requirements in the [project rubric](https://review.udacity.com/#!/rubrics/322/view)
+B) Lanes edges marked with red lines
 
+<img src="media/image3.png" width="309" height="206" />
 
-Creating a Great Writeup
----
-For this project, a great writeup should provide a detailed response to the "Reflection" section of the [project rubric](https://review.udacity.com/#!/rubrics/322/view). There are three parts to the reflection:
+1.  Lanes edges marked with single solid line
 
-1. Describe the pipeline
+**Steps/Pipeline:**
 
-2. Identify any shortcomings
+Each image will go through pipeline of image processing to detect lane
+edges. My pipeline consists of 7 steps
 
-3. Suggest possible improvements
+1.  Convert image to gray scale
 
-We encourage using images in your writeup to demonstrate how your pipeline works.  
+2.  Smooth image using Gaussian blur
 
-All that said, please be concise!  We're not looking for you to write a book here: just a brief description.
+3.  Edge detection using Canny Edge Detector
 
-You're not required to use markdown for your writeup.  If you use another method please just submit a pdf of your writeup. Here is a link to a [writeup template file](https://github.com/udacity/CarND-LaneLines-P1/blob/master/writeup_template.md). 
+4.  Identify region of interest
 
+5.  Detect lines using Hough transform
 
-The Project
----
+6.  Draw detected lines on original image
 
-## If you have already installed the [CarND Term1 Starter Kit](https://github.com/udacity/CarND-Term1-Starter-Kit/blob/master/README.md) you should be good to go!   If not, you should install the starter kit to get started on this project. ##
+### **Reflection:**
 
-**Step 1:** Set up the [CarND Term1 Starter Kit](https://classroom.udacity.com/nanodegrees/nd013/parts/fbf77062-5703-404e-b60c-95b78b2f3f9e/modules/83ec35ee-1e02-48a5-bdb7-d244bd47c2dc/lessons/8c82408b-a217-4d09-b81d-1bda4c6380ef/concepts/4f1870e0-3849-43e4-b670-12e6f2d4b7a7) if you haven't already.
+1.  **Pipeline Description:**
 
-**Step 2:** Open the code in a Jupyter Notebook
+<!-- -->
 
-You will complete the project code in a Jupyter notebook.  If you are unfamiliar with Jupyter Notebooks, check out <A HREF="https://www.packtpub.com/books/content/basics-jupyter-notebook-and-python" target="_blank">Cyrille Rossant's Basics of Jupyter Notebook and Python</A> to get started.
+1.  **Image to gray scale:**
 
-Jupyter is an Ipython notebook where you can run blocks of code and see results interactively.  All the code for this project is contained in a Jupyter notebook. To start Jupyter in your browser, use terminal to navigate to your project directory and then run the following command at the terminal prompt (be sure you've activated your Python 3 carnd-term1 environment as described in the [CarND Term1 Starter Kit](https://github.com/udacity/CarND-Term1-Starter-Kit/blob/master/README.md) installation instructions!):
+    First step in pipeline is to convert given image into gray scale
+    image which helps in detection of edges as intensity change is
+    easily identified in gray scale image.
 
-`> jupyter notebook`
+    *cv2.cvtColor(image, cv2.COLOR\_RGB2GRAY)*
 
-A browser window will appear showing the contents of the current directory.  Click on the file called "P1.ipynb".  Another browser window will appear displaying the notebook.  Follow the instructions in the notebook to complete the project.  
+    <img src="media/image4.png" width="624" height="616" />
 
-**Step 3:** Complete the project and submit both the Ipython notebook and the project writeup
+2.  **Apply smoothing:**
+
+    In next step, we apply smoothing to remove noise from the image. In
+    this project, I used gaussian blur with kernel size 5 to smooth
+    input images.
+
+    *cv2.GaussianBlur(image, (kernel\_size, kernel\_size), 0)*
+
+3.  **Edge Detection: **
+
+    Detecting edges in image will help to identify lanes. In this
+    project, I used Canny edge detector which uses image intensity
+    gradients to identify edges. This function takes two parameters high
+    threshold, low threshold.
+
+    If intensity gradient is more than high threshold it is marked as
+    strong edge and if between high and low threshold they
+    are connected.
+
+    As per recommendations, low and high thresholds are in ratio of 1:3
+    or 1:2. In my project I used 50, 150 as thresholds.
+
+    *cv2.Canny(image, low\_threshold, high\_threshold)*
+
+    <img src="media/image5.png" width="624" height="612" />
+
+4.  **Identify region of interest: **
+
+    In the image, we can see many lanes but we should focus on lines
+    which we are in. So, we use a quadrilateral mask to identify region
+    of interest. Any pixels outside of region of interest are marked
+    as black.
+
+    *cv2.fillPoly(mask, vertices, ignore\_mask\_color)*
+
+    <img src="media/image6.png" width="624" height="622" />
+
+5.  **Line Detection: **
+
+    I used Hough transform to detect lines in the image. Hough transform
+    transfers all pixels into parameter space and detect lines by
+    identifying intersecting lines in parameter space.
+
+    *lines = cv2.HoughLinesP(img, rho, theta, threshold, np.array(\[\]),
+    minLineLength=min\_line\_len, maxLineGap=max\_line\_gap)*
+
+    *cv2.line(img, (x1, y1), (x2, y2), color, thickness)*
+
+    <img src="media/image7.png" width="624" height="617" />
+
+    **Solid line from line detection: **
+
+    Instead of detecting multiple lines to detect a single solid line, I
+    modified draw\_lines() function to calculate slope and intercept for
+    left lane and right line by averaging all slopes and intercepts of
+    lines identified in Hough transform. I used these slope and
+    intercept values to create a single solid line for both left and
+    right lanes.
+
+    <img src="media/image8.png" width="624" height="618" />
+
+6.  **Draw Lines:** We can overlap original image and lanes lines image
+    to visualize identified lanes on original image.
+
+    *cv2.addWeighted(initial\_img, α, img, β, λ)*
+
+    <img src="media/image9.png" width="600" height="613" />
+
+### **Potential shortcomings with current pipeline:**
+
+-   Identifying lanes based on above approach is good when image is
+    clean and clear. In real world, images are not as good as given in
+    this project. We may encounter multiple problems like snow, rain,
+    shades on road which causes problem to identify lanes.
+
+-   We are fixing parameters to our image processing methods like region
+    of interest, edge and line detection. These parameters might not be
+    suitable to all scenarios like mentioned above making lane
+    detection hard.
+
+-   Averaging lines identified in Hough transform to calculate slope,
+    intercept is not suitable in other scenarios like curved roads.
+
+### **Possible improvements to pipeline:**
+
+-   Instead of setting parameters manually, we can use machine learning
+    based models \[Object segmentation\] to identify lanes in images.
+
+-   In above pipeline, we can try and use converting images into
+    different color spaces like HSV and HLV to improve edge detection
+    and it is affecting lane detection.
+
+-   We can try use different methods for identifying solid line instead
+    of averaging slopes, we can take weighted average based on lengths
+    of lines and see how it is affecting output.
+
 
