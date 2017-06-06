@@ -8,15 +8,15 @@ lanes. Following images show the output of this project, image A is a
 given natural image as input and image C is the final image output after
 applying image pipeline mentioned in next section.
 
-<img src="media/image1.jpeg" width="308" height="196" />
+<img src="./media/image1.jpeg" width="308" height="196" />
 
 1.  Plain Image
 
-<img src="media/image2.png" width="323" height="196" />
+<img src="./media/image2.png" width="323" height="196" />
 
 B) Lanes edges marked with red lines
 
-<img src="media/image3.png" width="309" height="206" />
+<img src="./media/image3.png" width="309" height="206" />
 
 1.  Lanes edges marked with single solid line
 
@@ -51,7 +51,7 @@ edges. My pipeline consists of 7 steps
 
     *cv2.cvtColor(image, cv2.COLOR\_RGB2GRAY)*
 
-    <img src="media/image4.png" width="624" height="616" />
+    <img src="./media/image4.png" width="624" height="616" />
 
 2.  **Apply smoothing:**
 
@@ -77,7 +77,7 @@ edges. My pipeline consists of 7 steps
 
     *cv2.Canny(image, low\_threshold, high\_threshold)*
 
-    <img src="media/image5.png" width="624" height="612" />
+    <img src="./media/image5.png" width="624" height="612" />
 
 4.  **Identify region of interest: **
 
@@ -88,7 +88,7 @@ edges. My pipeline consists of 7 steps
 
     *cv2.fillPoly(mask, vertices, ignore\_mask\_color)*
 
-    <img src="media/image6.png" width="624" height="622" />
+    <img src="./media/image6.png" width="624" height="622" />
 
 5.  **Line Detection: **
 
@@ -101,7 +101,7 @@ edges. My pipeline consists of 7 steps
 
     *cv2.line(img, (x1, y1), (x2, y2), color, thickness)*
 
-    <img src="media/image7.png" width="624" height="617" />
+    <img src="./media/image7.png" width="624" height="617" />
 
     **Solid line from line detection: **
 
@@ -112,14 +112,14 @@ edges. My pipeline consists of 7 steps
     intercept values to create a single solid line for both left and
     right lanes.
 
-    <img src="media/image8.png" width="624" height="618" />
+    <img src="./media/image8.png" width="624" height="618" />
 
 6.  **Draw Lines:** We can overlap original image and lanes lines image
     to visualize identified lanes on original image.
 
     *cv2.addWeighted(initial\_img, α, img, β, λ)*
 
-    <img src="media/image9.png" width="600" height="613" />
+    <img src="./media/image9.png" width="600" height="613" />
 
 ### **Potential shortcomings with current pipeline:**
 
